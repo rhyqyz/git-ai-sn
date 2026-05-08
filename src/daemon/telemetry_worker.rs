@@ -545,12 +545,17 @@ pub fn flush_notes() {
         return;
     }
 
-    let context = ApiContext::new(None);
-    let api_base_url = context.base_url.clone();
+    let backend_url = match Config::get().notes_backend_url() {
+        Some(url) => url.to_string(),
+        None => {
+            tracing::debug!("notes: skipping flush, notes_backend.backend_url is not configured");
+            return;
+        }
+    };
+    let context = ApiContext::new(Some(backend_url));
     let client = ApiClient::new(context);
 
-    let using_default_api = api_base_url == crate::config::DEFAULT_API_BASE_URL;
-    if using_default_api && !client.is_logged_in() && !client.has_api_key() {
+    if !client.is_logged_in() && !client.has_api_key() {
         tracing::debug!("notes: skipping flush, not authenticated");
         return;
     }

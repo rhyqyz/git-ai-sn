@@ -384,7 +384,15 @@ pub fn warm_cache_for_remote(repo: &Repository, _remote: &str) -> Result<(), Git
 
     // 3. Batch-fetch from the HTTP backend (chunks of 100).
     let cfg = crate::config::Config::fresh();
-    let backend_url = cfg.notes_backend_url().to_string();
+    let backend_url = match cfg.notes_backend_url() {
+        Some(url) => url.to_string(),
+        None => {
+            tracing::debug!(
+                "warm_cache_for_remote: notes_backend.backend_url is not configured; skipping"
+            );
+            return Ok(());
+        }
+    };
     let ctx = ApiContext::new(Some(backend_url));
     let client = ApiClient::new(ctx);
 

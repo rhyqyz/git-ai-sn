@@ -114,7 +114,15 @@ fn print_config_help() {
     println!("  quiet                        Suppress chart output after commits (bool)");
     println!("  git_ai_hooks                 Hook name -> shell commands map (object)");
     println!("  notes_backend.kind           Notes backend kind (git_notes/http)");
-    println!("  notes_backend.backend_url    Notes backend URL (defaults to api_base_url)");
+    println!("  notes_backend.backend_url    Notes backend base URL. Required when kind=http.");
+    println!(
+        "                               May include a path prefix; endpoints are appended to it."
+    );
+    println!(
+        "                               e.g. \"https://app.example.com/api/gitai\" -> requests are"
+    );
+    println!("                               sent to \"<base>/worker/notes/upload\" and");
+    println!("                               \"<base>/worker/notes/?commits=...\".");
     println!();
     println!("Repository Patterns:");
     println!("  For exclude/allow/exclude_prompts_in_repositories, you can provide:");

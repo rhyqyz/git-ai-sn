@@ -118,8 +118,6 @@ pub struct Config {
     custom_attributes: HashMap<String, String>,
     git_ai_hooks: HashMap<String, Vec<String>>,
     notes_backend: NotesBackendConfig,
-    /// Resolved notes backend URL: backend_url if set, else api_base_url
-    notes_backend_url: String,
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Default, Serialize)]
@@ -456,10 +454,12 @@ impl Config {
         self.notes_backend.kind
     }
 
-    /// Returns the resolved notes backend URL.
-    /// Falls back to `api_base_url` when `backend_url` is not explicitly configured.
-    pub fn notes_backend_url(&self) -> &str {
-        &self.notes_backend_url
+    /// Returns the configured notes backend URL, or `None` if unset.
+    ///
+    /// Callers must handle `None` explicitly — typically by skipping the operation when the HTTP backend
+    /// is enabled but no URL has been configured.
+    pub fn notes_backend_url(&self) -> Option<&str> {
+        self.notes_backend.backend_url.as_deref()
     }
 
     /// Returns true when the HTTP notes backend is active.
@@ -762,11 +762,6 @@ fn build_config() -> Config {
             .or_else(|| file_backend.as_ref().and_then(|b| b.backend_url.clone())),
     };
 
-    let notes_backend_url = notes_backend
-        .backend_url
-        .clone()
-        .unwrap_or_else(|| api_base_url.clone());
-
     #[cfg(any(test, feature = "test-support"))]
     {
         let mut config = Config {
@@ -789,7 +784,6 @@ fn build_config() -> Config {
             custom_attributes: custom_attributes.clone(),
             git_ai_hooks: git_ai_hooks.clone(),
             notes_backend,
-            notes_backend_url,
         };
         apply_test_config_patch(&mut config);
         config
@@ -816,7 +810,6 @@ fn build_config() -> Config {
         custom_attributes,
         git_ai_hooks,
         notes_backend,
-        notes_backend_url,
     }
 }
 
@@ -1242,19 +1235,9 @@ fn apply_test_config_patch(config: &mut Config) {
             );
         }
         if let Some(nb) = patch.notes_backend {
-            if let Some(kind) = Some(nb.kind) {
-                config.notes_backend.kind = kind;
-            }
+            config.notes_backend.kind = nb.kind;
             if let Some(url) = nb.backend_url {
-                config.notes_backend.backend_url = Some(url.clone());
-                config.notes_backend_url = url;
-            } else {
-                // Re-resolve: if no explicit URL, fall back to api_base_url
-                config.notes_backend_url = config
-                    .notes_backend
-                    .backend_url
-                    .clone()
-                    .unwrap_or_else(|| config.api_base_url.clone());
+                config.notes_backend.backend_url = Some(url);
             }
         }
     }
@@ -1294,7 +1277,6 @@ mod tests {
             custom_attributes: HashMap::new(),
             git_ai_hooks: HashMap::new(),
             notes_backend: NotesBackendConfig::default(),
-            notes_backend_url: DEFAULT_API_BASE_URL.to_string(),
         }
     }
 
@@ -1405,7 +1387,6 @@ mod tests {
             custom_attributes: HashMap::new(),
             git_ai_hooks: HashMap::new(),
             notes_backend: NotesBackendConfig::default(),
-            notes_backend_url: DEFAULT_API_BASE_URL.to_string(),
         }
     }
 
@@ -1525,7 +1506,6 @@ mod tests {
             custom_attributes: HashMap::new(),
             git_ai_hooks: HashMap::new(),
             notes_backend: NotesBackendConfig::default(),
-            notes_backend_url: DEFAULT_API_BASE_URL.to_string(),
         }
     }
 
@@ -1926,10 +1906,10 @@ mod tests {
     }
 
     #[test]
-    fn test_notes_backend_url_falls_back_to_api_base_url() {
-        // When backend_url is absent, notes_backend_url == api_base_url
+    fn test_notes_backend_url_unset_returns_none() {
+        // When backend_url is absent, notes_backend_url() is None. Callers must handle the unconfigured case explicitly.
         let config = create_test_config(vec![], vec![]);
-        assert_eq!(config.notes_backend_url(), DEFAULT_API_BASE_URL);
+        assert_eq!(config.notes_backend_url(), None);
     }
 
     #[test]

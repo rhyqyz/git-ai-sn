@@ -50,7 +50,19 @@ pub fn handle_notes_migrate(args: &[String]) {
     };
 
     // 3. Build the API client.
-    let backend_url = cfg.notes_backend_url().to_string();
+    let backend_url = match cfg.notes_backend_url() {
+        Some(url) => url.to_string(),
+        None => {
+            eprintln!(
+                "error: notes_backend.backend_url is not configured.\n\
+                 \n\
+                 Set it before running migrate, e.g.:\n\
+                 \n\
+                 \x20 git-ai config set notes_backend.backend_url https://your-backend.example.com"
+            );
+            std::process::exit(1);
+        }
+    };
     let ctx = ApiContext::new(Some(backend_url));
     let client = ApiClient::new(ctx);
 
@@ -453,7 +465,11 @@ mod tests {
 
         // Upload to the mock server.
         let cfg = crate::config::Config::fresh();
-        let ctx = ApiContext::new(Some(cfg.notes_backend_url().to_string()));
+        let backend_url = cfg
+            .notes_backend_url()
+            .expect("test should configure notes_backend.backend_url")
+            .to_string();
+        let ctx = ApiContext::new(Some(backend_url));
         let client = ApiClient::new(ctx);
 
         let note_entries: Vec<NoteEntry> = entries
