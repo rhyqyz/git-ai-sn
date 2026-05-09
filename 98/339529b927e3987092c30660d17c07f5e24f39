@@ -1,0 +1,22 @@
+tests/integration/main.rs
+  h_59d7725b70fc6f 87
+src/commands/checkpoint_agent/bash_tool.rs
+  h_59d7725b70fc6f 365-369,387,1254-1273
+src/commands/checkpoint_agent/presets/mod.rs
+  h_59d7725b70fc6f 20,166
+src/commands/checkpoint_agent/presets/qoder.rs
+  h_59d7725b70fc6f 1-369
+tests/integration/qoder.rs
+  h_59d7725b70fc6f 1-157
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "development:1.4.5",
+  "base_commit_sha": "98339529b927e3987092c30660d17c07f5e24f39",
+  "prompts": {},
+  "humans": {
+    "h_59d7725b70fc6f": {
+      "author": "rhyqyz <qinyzneu@163.com>"
+    }
+  }
+}
