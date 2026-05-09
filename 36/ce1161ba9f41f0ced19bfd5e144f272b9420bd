@@ -1,0 +1,14 @@
+agent-support/vscode/package.json
+  h_59d7725b70fc6f 85
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "development:1.4.5",
+  "base_commit_sha": "36ce1161ba9f41f0ced19bfd5e144f272b9420bd",
+  "prompts": {},
+  "humans": {
+    "h_59d7725b70fc6f": {
+      "author": "rhyqyz <qinyzneu@163.com>"
+    }
+  }
+}
