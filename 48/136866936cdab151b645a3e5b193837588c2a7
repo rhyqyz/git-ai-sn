@@ -1,0 +1,18 @@
+src/mdm/agents/qoder.rs
+  h_59d7725b70fc6f 1-633
+docs/superpowers/plans/2026-05-08-qoder-agent-preset.md
+  h_59d7725b70fc6f 5,7,9,11-15,19-21,26,28,30,32,39,43-45,48-70,74-77,81,86,88,101-102,105,111,114-123,131-142,154,162-166,202-227,230,257-260
+src/commands/checkpoint_agent/presets/qoder.rs
+  h_59d7725b70fc6f 30,45,100
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "development:1.4.5",
+  "base_commit_sha": "48136866936cdab151b645a3e5b193837588c2a7",
+  "prompts": {},
+  "humans": {
+    "h_59d7725b70fc6f": {
+      "author": "rhyqyz <qinyzneu@163.com>"
+    }
+  }
+}
